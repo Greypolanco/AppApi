@@ -1,18 +1,24 @@
 package com.example.appapi.ui.cliente
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarDuration
@@ -21,9 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +37,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.appapi.data.remote.dto.ClienteDto
+import com.example.appapi.util.Resource
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
@@ -40,7 +47,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun ClienteScreen(viewModel: ClienteViewModel = hiltViewModel())
 {
     val snackbarHostState = remember { SnackbarHostState() }
-
+    val clientes by viewModel.clientes.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
         viewModel.isMessageShownFlow.collectLatest {
             if (it) {
@@ -129,6 +136,53 @@ fun ClienteScreen(viewModel: ClienteViewModel = hiltViewModel())
             Icon(imageVector = Icons.Default.CheckCircle, contentDescription = "Guardar")
             Text(text = "Guardar")
         }
+        Spacer(modifier = Modifier.width(12.dp))
+        //consultaCliente()
+    consultaCliente(clientes =clientes , viewModel =viewModel )
+    }
+}
+
+@Composable
+fun consultaCliente(clientes: Resource<List<ClienteDto>>, viewModel: ClienteViewModel){
+    Text(text = "Historial de Clientes", style = MaterialTheme.typography.titleMedium)
+    LazyColumn( modifier = Modifier.fillMaxWidth()) {
+        items(clientes.data ?: emptyList()){ clientDto ->
+            consultaCLienteItem(clienteDto = clientDto, viewModel = viewModel)
+        }
+    }
+}
+
+@Composable
+fun consultaCLienteItem(clienteDto: ClienteDto, viewModel: ClienteViewModel){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(13.dp)
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = Color.Black,
+                    shape = RoundedCornerShape(10.dp)
+                )
+                .padding(13.dp)
+        ){
+            Text(text ="Nombre:" + clienteDto.nombres)
+            Text(text = "RNC: " + clienteDto.rnc)
+            Text(text = "Dirección " + clienteDto.direccion)
+            Text(text = "Limite De Crédito es Requerido" + clienteDto.limiteCredito)
+        }
+        Button(
+            onClick = {
+                clienteDto.clienteId?.let { viewModel.deleted(it, clienteDto) }
+            }
+        ) {
+            Text(text = "Eliminar")
+        }
+
 
     }
 }
