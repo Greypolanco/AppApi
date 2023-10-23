@@ -37,6 +37,11 @@ class ClienteViewModel @Inject constructor(
     var direccion by mutableStateOf("")
     var limiteCredito by mutableStateOf(0)
 
+    var nombresInvalido by mutableStateOf(true)
+    var rncInvalidado by mutableStateOf(true)
+    var direccionInvalida by mutableStateOf(true)
+    var limiteCreditoInvalida by mutableStateOf(true)
+
     private var _state = mutableStateOf(ClienteListState())
     val state: State<ClienteListState> = _state
 
@@ -80,8 +85,11 @@ class ClienteViewModel @Inject constructor(
                 rnc = rnc,
                 limiteCredito = limiteCredito
             )
-            clienteRepository.postCliente(cliente)
-            limpiar()
+            if(validar()){
+                clienteRepository.postCliente(cliente)
+                limpiar()
+            }
+
         }
     }
 
@@ -94,13 +102,36 @@ class ClienteViewModel @Inject constructor(
         }
     }
 
+    fun validar(): Boolean{
+        if(nombres.isBlank()) {
+            nombresInvalido = false
+            return nombresInvalido
+        }
+        if(rnc.isBlank()) {
+            rncInvalidado = false
+            return rncInvalidado
+        }
+        if(direccion.isBlank()) {
+            direccionInvalida = false
+            return direccionInvalida
+        }
+        else if(limiteCredito <= 0){
+            limiteCreditoInvalida= false
+            return limiteCreditoInvalida
+        }
+        else{
+            return true
+        }
+    }
 
-
-    private fun limpiar() {
+    fun limpiar() {
         nombres = ""
         rnc = ""
         direccion = ""
         limiteCredito = 0
-
+        nombresInvalido = true
+        rncInvalidado = true
+        direccionInvalida = true
+        limiteCreditoInvalida = true
     }
 }

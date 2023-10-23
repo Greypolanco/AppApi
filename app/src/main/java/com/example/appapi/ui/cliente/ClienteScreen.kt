@@ -26,10 +26,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 
@@ -49,12 +51,14 @@ fun ClienteScreen(viewModel: ClienteViewModel = hiltViewModel())
             }
         }
     }
+
     val keyBoardControlle = LocalSoftwareKeyboardController.current
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(8.dp)
     ) {
+        //Nombre
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -64,8 +68,12 @@ fun ClienteScreen(viewModel: ClienteViewModel = hiltViewModel())
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
         )
+        if(viewModel.nombresInvalido == false){
+        Text(text = "Nombre es Requerido", color = Color.Red, fontSize = 12.sp)
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
+        //RNC
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -76,35 +84,47 @@ fun ClienteScreen(viewModel: ClienteViewModel = hiltViewModel())
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
         )
+        if(viewModel.rncInvalidado == false){
+            Text(text = "RNC es Requerido", color = Color.Red, fontSize = 12.sp)
+        }
         Spacer(modifier = Modifier.height(8.dp))
+        //Dirección
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
             value = viewModel.direccion,
             onValueChange = {viewModel.direccion = it},
-            label = { Text(text = "Direccion")},
+            label = { Text(text = "Dirección")},
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Next)
         )
+        if(viewModel.direccionInvalida == false){
+            Text(text = "Dirección es Requerida", color = Color.Red, fontSize = 12.sp)
+        }
         Spacer(modifier = Modifier.height(8.dp))
+        //Limite De Crédito
         OutlinedTextField(
             value = viewModel.limiteCredito.toString(),
             onValueChange = {
                 viewModel.limiteCredito = it.toIntOrNull() ?: 0
             },
-            label = { Text(text = "Limite De Credito")},
+            label = { Text(text = "Limite De Crédito")},
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Next,
                 keyboardType = KeyboardType.Number
             )
         )
+        if(viewModel.limiteCreditoInvalida == false){
+            Text(text = "Limite De Crédito es Requerido", color = Color.Red, fontSize = 12.sp)
+        }
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedButton(onClick = {
             keyBoardControlle?.hide()
-            viewModel.save()
-
+            if(viewModel.validar()){
+                viewModel.save()
+            }
         }, modifier = Modifier.fillMaxWidth()) {
             Icon(imageVector = Icons.Default.CheckCircle, contentDescription = "Guardar")
             Text(text = "Guardar")
