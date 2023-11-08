@@ -93,4 +93,8 @@ dependencies {
     // Para poder usar collectAsStateWithLifeCycle
     implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifeCycleVersion")
 
+    val nav_version = "2.5.3"
+
+    implementation("androidx.navigation:navigation-compose:$nav_version")
+
 }
